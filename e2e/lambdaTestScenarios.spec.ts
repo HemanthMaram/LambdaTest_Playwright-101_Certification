@@ -35,20 +35,19 @@ const capabilities = [
 
 
 
-// capabilities.forEach(async (capability) => {
+capabilities.forEach(async (capability) => {
     let page:Page ;
    
         test.beforeEach(async () => {
-         const browser = await chromium.launch({ headless: false });
-            //  await chromium.connect({
-            //     wsEndpoint: `wss://cdp.lambdatest.com/playwright?capabilities=${encodeURIComponent(JSON.stringify(capability))}`
-            //   })
+         const browser =  await chromium.connect({
+                wsEndpoint: `wss://cdp.lambdatest.com/playwright?capabilities=${encodeURIComponent(JSON.stringify(capability))}`
+              })
                page = await browser.newPage()
             
               await page.goto('/selenium-playground')
         })
-//${capability.browserName}-${capability.browserVersion}
-        test(`Test Scenario1 - Simple Form Demo -`, async ()=>{
+
+        test(`Test Scenario1 - Simple Form Demo - ${capability.browserName}-${capability.browserVersion}`, async ()=>{
             await page.locator('a[href*="simple-form-demo"]').click()
             await expect( page.url()).toContain('simple-form-demo')
             let message = 'Welcome to LambdaTest'
@@ -59,7 +58,15 @@ const capabilities = [
 
         })
 
-        test(`Test Scenario3 - Input Form Submit -`, async ()=>{
+        test(`Test Scenario2 - Drag and Drop Slider - ${capability.browserName}-${capability.browserVersion}`,async()=>{
+          let target ='95';
+          await page.locator('a[href*="drag-drop-range-sliders-demo"]').click()
+          await page.locator('#slider3').getByRole('slider').fill(target);
+          
+          await expect(page.locator('#rangeSuccess')).toHaveText(target)
+        })
+
+        test(`Test Scenario3 - Input Form Submit -${capability.browserName}-${capability.browserVersion}`, async ()=>{
           let submitButton = page.getByRole('button',{name:'Submit'})
           await page.locator('a[href*="input-form-demo"]').click()
           await expect( page.url()).toContain('input-form-demo')
@@ -79,17 +86,10 @@ const capabilities = [
           await expect( page.locator('p.success-msg')).toHaveText(testData.successMessage)
         })
 
-        test.only(`Test Scenario2 - Drag and Drop Slider`,async()=>{
-          let target ='95';
-          await page.locator('a[href*="drag-drop-range-sliders-demo"]').click()
-          await page.locator('#slider3').getByRole('slider').fill(target);
-          
-          await expect(page.locator('#rangeSuccess')).toHaveText(target)
-        })
 
         test.afterEach(async ({browser}) => {
             await browser.close();
             
           });
-    // })
+    })
 
