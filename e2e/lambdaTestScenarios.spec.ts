@@ -1,6 +1,6 @@
-import { Page } from "@playwright/test";
-const { chromium } = require("playwright");
-const { expect, test, browser } = require("@playwright/test");
+import { Browser, Page } from "@playwright/test";
+// const { chromium } = require("playwright");
+const { expect, test,chromium } = require("@playwright/test");
 import testData from "../testData/testData.json";
 const capabilities = [
   {
@@ -35,13 +35,19 @@ const capabilities = [
 
 capabilities.forEach(async (capability) => {
   let page: Page;
+  let browser:Browser
 
-  test.beforeEach(async () => {
-    const browser = await chromium.connect({
+  test.beforeAll(async()=>{
+     browser = await chromium.connect({
       wsEndpoint: `wss://cdp.lambdatest.com/playwright?capabilities=${encodeURIComponent(
         JSON.stringify(capability)
       )}`,
     });
+
+  })
+
+  test.beforeEach(async () => {
+    
     page = await browser.newPage();
 
     await page.goto("/selenium-playground");
@@ -86,7 +92,7 @@ capabilities.forEach(async (capability) => {
     );
   });
 
-  test.afterEach(async ({ browser }) => {
+  test.afterAll(async ({ browser }) => {
     await browser.close();
   });
 });
