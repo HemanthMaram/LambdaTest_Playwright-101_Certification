@@ -1,5 +1,4 @@
 import { Page } from "@playwright/test";
-
 const { chromium } = require("playwright");
 const { expect, test,browser } = require("@playwright/test");
 import testData from '../testData/testData.json'
@@ -9,8 +8,8 @@ const capabilities = [
     browserVersion: "133.0",
     "LT:Options": {
       platform: "Windows 10",
-      build: "Playwright Sample Build",
-      name: "Playwright Sample Test on Windows 10 - Chrome",
+      build: "Playwright-101 certification",
+      name: "Playwright Test on Windows 10 - Chrome",
       user: "maram_reddy",
       accessKey: "SCISwXUASTvo70f46ns7enOioeC21SZX4mMzL7RBumPTdykrIe",
       network: true,
@@ -23,29 +22,15 @@ const capabilities = [
     browserVersion: "130.0",
     "LT:Options": {
       platform: "macOS Ventura",
-      build: "Playwright Sample Build",
-      name: "Playwright Sample Test on macOS Ventura- MicrosoftEdge",
+      build: "Playwright-101 certification",
+      name: "Playwright Test on macOS Ventura- MicrosoftEdge",
       user: "maram_reddy",
       accessKey: "SCISwXUASTvo70f46ns7enOioeC21SZX4mMzL7RBumPTdykrIe",
       network: true,
       video: true,
       console: true,
     },
-  },
-  {
-    browserName: "pw-firefox",
-    browserVersion: "130.0",
-    "LT:Options": {
-      platform: "Windows 11",
-      build: "Playwright Sample Build",
-      name: "Playwright Sample Test on Windows 11 - pw-firefox",
-      user: "maram_reddy",
-      accessKey: "SCISwXUASTvo70f46ns7enOioeC21SZX4mMzL7RBumPTdykrIe",
-      network: true,
-      video: true,
-      console: true,
-    },
-  },
+  }
 ];
 
 
@@ -60,11 +45,11 @@ const capabilities = [
             //   })
                page = await browser.newPage()
             
-              await page.goto('/selenium-playground',{waitUntil:"networkidle"})
+              await page.goto('/selenium-playground')
         })
 //${capability.browserName}-${capability.browserVersion}
         test(`Test Scenario1 - Simple Form Demo -`, async ()=>{
-            await page.getByText('Simple Form Demo').click()
+            await page.locator('a[href*="simple-form-demo"]').click()
             await expect( page.url()).toContain('simple-form-demo')
             let message = 'Welcome to LambdaTest'
             await page.getByPlaceholder('Please enter your Message').fill(message)
@@ -74,26 +59,32 @@ const capabilities = [
 
         })
 
-        test.only(`Test Scenario3 - Input Form Submit -`, async ()=>{
+        test(`Test Scenario3 - Input Form Submit -`, async ()=>{
           let submitButton = page.getByRole('button',{name:'Submit'})
-          await page.getByText('Input Form Submit').click()
+          await page.locator('a[href*="input-form-demo"]').click()
+          await expect( page.url()).toContain('input-form-demo')
           await submitButton.click()
-          await page.getByPlaceholder('Name').fill(testData.name)
-          await page.getByPlaceholder('Email').fill(testData.email)
+          await page.locator('input[placeholder="Name"]').fill(testData.name)      
+          await page.locator('#inputEmail4').fill(testData.email)
           await page.getByPlaceholder('Password').fill(testData.password)
           await page.locator('#company').fill(testData.company)
           await page.locator('#websitename').fill(testData.website)
-          await page.selectOption('select[name="country"]',{value:testData.country})
+          await page.locator('select[name="country"]').selectOption(testData.country)
           await page.locator('input[name="city"]').fill(testData.city)
           await page.getByPlaceholder('Address 1').fill(testData.address1)
           await page.locator('#inputAddress2').fill(testData.address2)
           await page.locator('//*[@placeholder="State"]').fill(testData.state)
           await page.locator('//*[@name="zip"]').fill(testData.zipCode)
           await submitButton.click()
-          await page.pause()
+          await expect( page.locator('p.success-msg')).toHaveText(testData.successMessage)
+        })
 
-        
-
+        test.only(`Test Scenario2 - Drag and Drop Slider`,async()=>{
+          let target ='95';
+          await page.locator('a[href*="drag-drop-range-sliders-demo"]').click()
+          await page.locator('#slider3').getByRole('slider').fill(target);
+          
+          await expect(page.locator('#rangeSuccess')).toHaveText(target)
         })
 
         test.afterEach(async ({browser}) => {
